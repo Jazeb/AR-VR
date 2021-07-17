@@ -15,7 +15,7 @@ app.post('/user', (req, res) => {
             return res.status(400).json({error:true, msg:'Error adding user'})
         }
         console.log(result)
-        req.status(200).json({error:false, msg: 'User added successfully'})
+        res.status(200).json({error:false, msg: 'User added successfully'})
     });
 });
 

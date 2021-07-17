@@ -8,7 +8,7 @@ const User = Schema({
     },
     gender: {
         type: String,
-        required: 0
+        required: false
     },
     age: {
         type: Number,
