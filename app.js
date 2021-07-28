@@ -1,8 +1,11 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const bcrypt = require('bcrypt')
 const app = express();
 
 const User = require('./schema/user');
+const Profile = require('./schema/profile');
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,6 +19,27 @@ app.post('/user', (req, res) => {
         }
         console.log(result)
         res.status(200).json({error:false, msg: 'User added successfully'})
+    });
+});
+
+app.post('/user/signup', async(req, res) => {
+
+    if(req.body.is_social_login && !req.body.token)
+        return res.status(400).json({error:true, msg:'Provide token as user is from social login'});
+    
+    const user = await Profile.findOne({email});
+    if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
+    const salt = bcrypt.genSaltSync(10);
+
+    req.body.password = bcrypt.hashSync(req.body.password, salt);
+    const profile = new Profile(req.body);
+    profile.save((err, result) => {
+        if(err) {
+            console.log(err);
+            return res.status(400).json({error:true, msg:'Error user signup'})
+        }
+        console.log(result)
+        res.status(200).json({error:false, msg: 'User created successfully', user:result})
     });
 });
 
