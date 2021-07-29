@@ -49,8 +49,9 @@ app.post('/user/social/signup', async(req, res) => {
     if(!['FACEBOOK', 'GOOGLE', 'APPLE'].includes(req.body.social_login_type))
         return res.status(400).json({error:true, msg:'Invalid value for social type'});
     
-    const user = await Profile.findOne({email:req.body.email});
-    if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
+    const user = await Profile.findOne({email:req.body.email, is_social_login:true});
+    if(user)
+        return res.status(200).json({error:false, msg:user});
 
     req.body.is_social_login = true;
     const profile = new Profile(req.body);
@@ -64,6 +65,21 @@ app.post('/user/social/signup', async(req, res) => {
     });
 });
 
+app.post('/login', async (req, res) => {
+    const {email, password} = req.body;
+    if(!email || !password)
+        return res.json({error:true, msg:'Provide email and password'});
+
+    const user = await Profile.findOne({email});
+    if(!user)
+        return res.status(400).json({error:true, msg:'User does not exist'});
+    
+    const isValid = bcrypt.compare(password, user.password);
+    if(!isValid)
+        return res.status(400).json({error:true, msg:'Invalid password'});
+    
+    return res.status(200).json({error:false, msg:user})
+})
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));
 app.all("*", (req, res) => res.status(404).json({ error: true, message: 'invalid url' }));
