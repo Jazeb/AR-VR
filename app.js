@@ -24,14 +24,12 @@ app.post('/user', (req, res) => {
 
 app.post('/user/signup', async(req, res) => {
 
-    if(req.body.is_social_login && !req.body.token)
-        return res.status(400).json({error:true, msg:'Provide token as user is from social login'});
-    
-    const user = await Profile.findOne({email});
+    const user = await Profile.findOne({email:req.body.email});
     if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
     const salt = bcrypt.genSaltSync(10);
 
     req.body.password = bcrypt.hashSync(req.body.password, salt);
+
     const profile = new Profile(req.body);
     profile.save((err, result) => {
         if(err) {
@@ -42,6 +40,30 @@ app.post('/user/signup', async(req, res) => {
         res.status(200).json({error:false, msg: 'User created successfully', user:result})
     });
 });
+
+app.post('/user/social/signup', async(req, res) => {
+
+    if(!req.body.token)
+        return res.status(400).json({error:true, msg:'Provide token as user is from social login'});
+
+    if(!['FACEBOOK', 'GOOGLE', 'APPLE'].includes(req.body.social_login_type))
+        return res.status(400).json({error:true, msg:'Invalid value for social type'});
+    
+    const user = await Profile.findOne({email:req.body.email});
+    if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
+
+    req.body.is_social_login = true;
+    const profile = new Profile(req.body);
+    profile.save((err, result) => {
+        if(err) {
+            console.log(err);
+            return res.status(400).json({error:true, msg:'Error user signup'})
+        }
+        console.log(result)
+        res.status(200).json({error:false, msg: 'User created successfully', user:result})
+    });
+});
+
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));
 app.all("*", (req, res) => res.status(404).json({ error: true, message: 'invalid url' }));
