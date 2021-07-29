@@ -65,7 +65,7 @@ app.post('/user/social/signup', async(req, res) => {
     });
 });
 
-app.post('/login', async (req, res) => {
+app.post('/user/login', async (req, res) => {
     const {email, password} = req.body;
     if(!email || !password)
         return res.json({error:true, msg:'Provide email and password'});
