@@ -10,6 +10,22 @@ const User = Schema({
         type: String,
         required: false
     },
+    country: {
+        type: String,
+        required: false
+    },
+    address: {
+        type: String,
+        required: false
+    },
+    phone_no: {
+        type: String,
+        required: false
+    },
+    dob: {
+        type: String,
+        required: false
+    },
     age: {
         type: Number,
         required: false
