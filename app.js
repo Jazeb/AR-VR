@@ -1,19 +1,35 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const formData = require("express-form-data");
+const os = require("os");
 const app = express();
 
 const User = require('./schema/user');
 const Profile = require('./schema/profile');
 
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const options = {
+    uploadDir: os.tmpdir(),
+    autoClean: true
+  };
+
+app.use(formData.parse(options));
+// delete from the request all empty files (size == 0)
+app.use(formData.format());
+// change the file objects to fs.ReadStream 
+app.use(formData.stream());
+// union the body and the files
+app.use(formData.union());
+
+// parse application/json
 
 app.post('/user', (req, res) => {
     const user = new User(req.body);
     user.save((err, result) => {
-        if(err){
+        if(err) {
             console.log(err);
             return res.status(400).json({error:true, msg:'Error adding user'})
         }
@@ -71,6 +87,8 @@ app.post('/user/signup', async(req, res) => {
 
 app.post('/user/login', async (req, res) => {
     const { email, password } = req.body;
+    console.log("req.body")
+    console.log(req.body)
     if(!email || !password)
         return res.json({error:true, msg:'Provide email and password'});
 
@@ -83,7 +101,7 @@ app.post('/user/login', async (req, res) => {
         return res.status(400).json({error:true, msg:'Invalid password'});
     
     return res.status(200).json({error:false, msg:user})
-})
+});
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));
 app.all("*", (req, res) => res.status(404).json({ error: true, message: 'invalid url' }));
