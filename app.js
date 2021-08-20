@@ -1,4 +1,5 @@
 const bodyParser = require('body-parser');
+const cors = require("cors");
 const express = require('express');
 const bcrypt = require('bcrypt');
 const formData = require("express-form-data");
@@ -8,8 +9,9 @@ const app = express();
 const User = require('./schema/user');
 const Profile = require('./schema/profile');
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 const options = {
     uploadDir: os.tmpdir(),
@@ -20,9 +22,10 @@ app.use(formData.parse(options));
 // delete from the request all empty files (size == 0)
 app.use(formData.format());
 // change the file objects to fs.ReadStream 
-app.use(formData.stream());
+// app.use(formData.stream());
 // union the body and the files
 app.use(formData.union());
+
 
 // parse application/json
 
