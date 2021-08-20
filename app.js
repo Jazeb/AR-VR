@@ -40,6 +40,9 @@ app.post('/user', (req, res) => {
 
 app.post('/user/signup', async(req, res) => {
 
+    if(!req.body.email || !req.body.password)
+        return res.status(400).json({ error:true, msg:'Provide email and password'});
+
     const user = await Profile.findOne({email:req.body.email});
     if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
 
