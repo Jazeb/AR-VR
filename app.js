@@ -29,7 +29,7 @@ app.use(formData.union());
 
 // parse application/json
 
-app.post('/user', (req, res) => {
+app.post('/api/user', (req, res) => {
     const user = new User(req.body);
     user.save((err, result) => {
         if(err) {
@@ -41,7 +41,7 @@ app.post('/user', (req, res) => {
     });
 });
 
-app.post('/user/signup', async(req, res) => {
+app.post('/api/user/signup', async(req, res) => {
 
     if(!req.body.email || !req.body.password)
         return res.status(400).json({ error:true, msg:'Provide email and password'});
@@ -91,7 +91,7 @@ app.post('/user/signup', async(req, res) => {
 //     });
 // });
 
-app.post('/user/login', async (req, res) => {
+app.post('/api/user/login', async (req, res) => {
     const { email, password } = req.body;
     console.log("req.body")
     console.log(req.body)
