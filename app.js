@@ -38,7 +38,7 @@ app.post('/api/user', (req, res) => {
     delete req.body._id;
 
     console.log(req.body)
-    Profile.findByIdAndUpdate({ _id }, req.body).then(result => {
+    Profile.findByIdAndUpdate({ _id }, req.body, { new: true }).then(result => {
         console.log(result);
         return res.status(200).json({error:false, msg: 'User updated successfully', data:result});
     });
