@@ -30,15 +30,28 @@ app.use(formData.union());
 // parse application/json
 
 app.post('/api/user', (req, res) => {
-    const user = new User(req.body);
-    user.save((err, result) => {
-        if(err) {
-            console.log(err);
-            return res.status(400).json({error:true, msg:'Error adding user'})
-        }
-        console.log(result)
-        res.status(200).json({error:false, msg: 'User added successfully'})
+
+    if(!req.body._id)
+        return res.status(400).json({error:true, msg:'Provide _id of user'});
+
+    const { _id } = req.body;
+    delete req.body._id;
+
+    console.log(req.body)
+    Profile.findByIdAndUpdate({ _id }, req.body).then(result => {
+        console.log(result);
+        return res.status(200).json({error:false, msg:'User updated successfully'});
     });
+
+    // const user = new User(req.body);
+    // user.save((err, result) => {
+    //     if(err) {
+    //         console.log(err);
+    //         return res.status(400).json({error:true, msg:'Error adding user'})
+    //     }
+    //     console.log(result)
+    //     res.status(200).json({error:false, msg: 'User added successfully'})
+    // });
 });
 
 app.post('/api/user/signup', async(req, res) => {
@@ -93,8 +106,6 @@ app.post('/api/user/signup', async(req, res) => {
 
 app.post('/api/user/login', async (req, res) => {
     const { email, password } = req.body;
-    console.log("req.body")
-    console.log(req.body)
     if(!email || !password)
         return res.json({error:true, msg:'Provide email and password'});
 
@@ -102,11 +113,11 @@ app.post('/api/user/login', async (req, res) => {
     if(!user)
         return res.status(400).json({error:true, msg:'User does not exist'});
     
-    const isValid = bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password); 
     if(!isValid)
         return res.status(400).json({error:true, msg:'Invalid password'});
     
-    return res.status(200).json({error:false, msg:user})
+    return res.status(200).json({error:false, msg:user});
 });
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));

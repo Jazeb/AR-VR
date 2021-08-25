@@ -13,6 +13,34 @@ const Profile = Schema({
     password: {
         type: String,
         required: true
+    },
+    gender: {
+        type: String,
+        required: false
+    },
+    country: {
+        type: String,
+        required: false
+    },
+    address: {
+        type: String,
+        required: false
+    },
+    phone_no: {
+        type: String,
+        required: false
+    },
+    dob: {
+        type: String,
+        required: false
+    },
+    age: {
+        type: Number,
+        required: false
+    },
+    favourite_food: {
+        type: String,
+        required: false
     }
 }, { collection: 'profile' }, { __v: false });
 
