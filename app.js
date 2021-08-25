@@ -117,7 +117,7 @@ app.post('/api/user/login', async (req, res) => {
     if(!isValid)
         return res.status(400).json({error:true, msg:'Invalid password'});
     
-    return res.status(200).json({error:false, msg:user});
+    return res.status(200).json({error:false, msg:'Logged in successfully', data:user});
 });
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));
