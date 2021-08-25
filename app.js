@@ -40,7 +40,7 @@ app.post('/api/user', (req, res) => {
     console.log(req.body)
     Profile.findByIdAndUpdate({ _id }, req.body).then(result => {
         console.log(result);
-        return res.status(200).json({error:false, msg:'User updated successfully'});
+        return res.status(200).json({error:false, data:result});
     });
 
     // const user = new User(req.body);
