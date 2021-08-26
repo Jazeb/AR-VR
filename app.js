@@ -1,4 +1,4 @@
-const bodyParser = require('body-parser');
+const { body, validationResult} = require('express-validator');
 const cors = require("cors");
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -6,7 +6,6 @@ const formData = require("express-form-data");
 const os = require("os");
 const app = express();
 
-const User = require('./schema/user');
 const Profile = require('./schema/profile');
 
 app.use(express.json());
@@ -54,8 +53,13 @@ app.post('/api/user', (req, res) => {
     // });
 });
 
-app.post('/api/user/signup', async(req, res) => {
+app.post('/api/user/signup', [
+    body('email').isEmail().withMessage('Provide valid email'),
+    body('password').isLength({ min: 5 }).withMessage('Password must be min 5 characters')
+  ], async(req, res) => {
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ error:true, msg: errors.array()[0].msg });
     if(!req.body.email || !req.body.password)
         return res.status(400).json({ error:true, msg:'Provide email and password'});
 
