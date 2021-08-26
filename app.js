@@ -55,7 +55,7 @@ app.post('/api/user', (req, res) => {
 
 app.post('/api/user/signup', [
     body('email').isEmail().withMessage('Provide valid email'),
-    body('password').isLength({ min: 5 }).withMessage('Password must be min 5 characters')
+    body('password').isLength({ min: 5, max: 10 }).withMessage('Password must be min 5 characters')
   ], async(req, res) => {
 
     const errors = validationResult(req);
