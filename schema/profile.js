@@ -41,6 +41,26 @@ const Profile = Schema({
     favourite_food: {
         type: String,
         required: false
+    },
+    spell_game_stats: {
+        level:{
+            type: Number,
+            required: true
+        },
+        troffy:{
+            type: Number,
+            required: true
+        }
+    },
+    puzzle_game_stats: {
+        level:{
+            type: Number,
+            required: true
+        },
+        troffy:{
+            type: Number,
+            required: true
+        }
     }
 }, { collection: 'profile' }, { __v: false });
 
