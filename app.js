@@ -15,7 +15,7 @@ app.use(cors());
 const options = {
     uploadDir: os.tmpdir(),
     autoClean: true
-  };
+};
 
 app.use(formData.parse(options));
 // delete from the request all empty files (size == 0)
@@ -54,7 +54,7 @@ app.post('/api/user/updatestats', (req, res) => {
         { new: true })
         .then(result => {
         console.log(result);
-        return res.status(200).json({error:false, msg: 'User updated successfully', data:result});
+        return res.status(200).json({error:false, msg: 'Key60', data:result});
     });
 });
 
@@ -69,7 +69,7 @@ app.post('/api/user', (req, res) => {
     console.log(req.body)
     Profile.findByIdAndUpdate({ _id }, req.body, { new: true }).then(result => {
         console.log(result);
-        return res.status(200).json({error:false, msg: 'User updated successfully', data:result});
+        return res.status(200).json({error:false, msg: 'Key60', data:result});
     });
 
     // const user = new User(req.body);
@@ -110,7 +110,7 @@ app.post('/api/user/signup', [
             return res.status(400).json({error:true, msg:'Error user signup'})
         }
         console.log(result)
-        res.status(200).json({error:false, msg: 'User created successfully', user:result})
+        res.status(200).json({ error:false, msg: 'User created successfully', user:result });
     });
 });
 
@@ -141,17 +141,17 @@ app.post('/api/user/signup', [
 app.post('/api/user/login', async (req, res) => {
     const { email, password } = req.body;
     if(!email || !password)
-        return res.json({error:true, msg:'Provide email and password'});
+        return res.json({ error:true, msg:'Provide email and password'});
 
     const user = await Profile.findOne({email});
     if(!user)
-        return res.status(400).json({error:true, msg:'User does not exist'});
+        return res.status(400).json({ error:true, msg:'Key61' });
     
     const isValid = await bcrypt.compare(password, user.password); 
     if(!isValid)
-        return res.status(400).json({error:true, msg:'Invalid password'});
+        return res.status(400).json({ error:true, msg:'Key62'});
     
-    return res.status(200).json({error:false, msg:'Logged in successfully', data:user});
+    return res.status(200).json({ error:false, msg:'Logged in successfully', data:user});
 });
 
 app.get("/", (req, res) => res.status(200).json({ status: true, result: 'server is running' }));
