@@ -28,6 +28,36 @@ app.use(formData.union());
 
 // parse application/json
 
+
+app.post('/api/user/updatestats', (req, res) => {
+    const { level, troffy, gameName, _id } = req.body; //spellgame, puzzlegame
+    if(!level || !troffy || !gameName || !_id)
+        return res.status(400).json({error: true, msg: 'Provide required fields'});
+    
+    if(!['spellGame', 'puzzleGame'].includes(gameName))
+        return res.status(400).json({ error:true, msg: 'Invalid game name provided' });
+
+    let set = null;;
+    let inc = { 'spell_game_stats.troffy': +troffy };
+
+    if(gameName == 'spellGame') {
+        set = { 'spell_game_stats.level': level };
+        inc = { 'spell_game_stats.troffy': +troffy };
+    } 
+    else {
+        set = { 'puzzle_game_stats.level': level };
+        inc = { 'puzzle_game_stats.troffy': +troffy };
+    }
+    Profile.findByIdAndUpdate(
+        { _id }, 
+        { $set: set, $inc: inc}, 
+        { new: true })
+        .then(result => {
+        console.log(result);
+        return res.status(200).json({error:false, msg: 'User updated successfully', data:result});
+    });
+});
+
 app.post('/api/user', (req, res) => {
 
     if(!req.body._id)
