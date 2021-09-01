@@ -102,7 +102,19 @@ app.post('/api/user/signup', [
     const salt = bcrypt.genSaltSync(10);
 
     req.body.password = bcrypt.hashSync(req.body.password, salt);
+    const spell_game_stats = {
+        level: 0,
+        troffy: 0
+    }
 
+    const puzzle_game_stats = {
+        level: 0,
+        troffy: 0
+    }
+
+    req.body.spell_game_stats = spell_game_stats;
+    req.body.puzzle_game_stats = puzzle_game_stats;
+    
     const profile = new Profile(req.body);
     profile.save((err, result) => {
         if(err) {
