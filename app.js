@@ -84,8 +84,8 @@ app.post('/api/user', (req, res) => {
 });
 
 app.post('/api/user/signup', [
-    body('email').isEmail().withMessage('Provide valid email'),
-    body('password').isLength({ min: 4, max: 10 }).withMessage('Password must be min 5 characters')
+    body('email').isEmail().withMessage('Please enter a valid email address'),
+    body('password').isLength({ min: 4, max: 10 }).withMessage('Password must contain min. 4 characters and max. 10 characters')
   ], async(req, res) => {
 
     const errors = validationResult(req);
@@ -93,8 +93,8 @@ app.post('/api/user/signup', [
     if(!req.body.email || !req.body.password)
         return res.status(400).json({ error:true, msg:'Provide email and password'});
 
-    const user = await Profile.findOne({email:req.body.email});
-    if(user) return res.status(400).json({error:true, msg: 'User already exists with this email'});
+    const user = await Profile.findOne({ email:req.body.email });
+    if(user) return res.status(400).json({error:true, msg: 'Email already exists!'});
 
     if(req.body.password !== req.body.confirm_password)
         return res.status(400).json({error:true, msg:'Password must match'});
