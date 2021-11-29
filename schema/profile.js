@@ -10,6 +10,18 @@ const Profile = Schema({
         type: String,
         required: true,
     },
+    otp:{
+        type: Number,
+        required:false
+    },
+    isOtpVerified: {
+        type: Boolean,
+        required: false
+    },
+    verified:{
+        type: Boolean,
+        required: false
+    },
     password: {
         type: String,
         required: true

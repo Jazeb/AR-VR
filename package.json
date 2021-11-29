@@ -23,6 +23,7 @@
     "express": "^4.17.1",
     "express-form-data": "^2.0.17",
     "express-validator": "^6.12.1",
-    "mongoose": "^5.13.7"
+    "mongoose": "^5.13.7",
+    "nodemailer": "^6.7.2"
   }
 }

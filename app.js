@@ -8,6 +8,8 @@ const app = express();
 
 const Profile = require('./schema/profile');
 
+const mailer = require('./mailer');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -83,6 +85,47 @@ app.post('/api/user', (req, res) => {
     // });
 });
 
+// app.put('/api/sendEmailOtp', async (req, res) => {
+//     const { email } = req.body;
+//     if(!email) return res.status(400).json({ error:true, msg: 'Provide email' });
+
+//     const user = await Profile.findOne({ email });
+//     if(!user) return res.status(400).json({error:true, msg: 'Email does not exist'});
+
+//     let otp = Math.floor(1000 + Math.random() * 9000);
+//     let data = { otp, email };
+    
+//     await Promise.all([
+//         mailer.sendOTPToEmail(data),
+//         Profile.updateOne({ _id:user._id }, { $set:{ otp, verified:0 }}),
+//     ]);
+
+//     return res.status(200).json({ error:false, msg:'OTP sent to your registered email' });
+
+// });
+
+app.get('/api/verifyEmail', (req, res) => {
+    try {
+        let { otp, email } = req.query;
+        if(!otp || !email) return res.status(400).json({ error:true, msg:'Provide OTP and email '});
+    
+        const user = await Profile.findOne({ email });
+        if(!user) return res.status(400).json({ error:true, msg: 'Email does not exist' });
+
+        if(user.isOtpVerified) return res.status(400).json({ error:true, msg:'OTP already verified for this user' });
+    
+        if(user.otp !== +otp) return res.status(400).json({ error:true, msg:'Invalid OTP' });
+        
+        res.status(200).json({ error:false, msg:'OTP verified successfully' });
+        await Profile.updateOne({ _id:user._id }, { $set:{ verified:true }});
+        return;
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(400).json({ error:true, msg:error.message });
+    }
+});
+
 app.post('/api/user/signup', [
     body('email').isEmail().withMessage('Please enter a valid email address'),
     body('password').isLength({ min: 4, max: 10 }).withMessage('Password must contain min. 4 characters and max. 10 characters')
@@ -94,14 +137,16 @@ app.post('/api/user/signup', [
         return res.status(400).json({ error:true, msg:'Provide email and password'});
 
     const user = await Profile.findOne({ email:req.body.email });
-    if(user) return res.status(400).json({error:true, msg: 'Email already exists!'});
+    if(user) return res.status(400).json({ error:true, msg: 'Email already exists!' });
 
     if(req.body.password !== req.body.confirm_password)
-        return res.status(400).json({error:true, msg:'Password must match'});
+        return res.status(400).json({ error:true, msg:'Password must match' });
         
     const salt = bcrypt.genSaltSync(10);
 
     req.body.password = bcrypt.hashSync(req.body.password, salt);
+    req.body.isOtpVerified = false;
+    
     const spell_game_stats = {
         level: 0,
         troffy: 0
@@ -118,11 +163,20 @@ app.post('/api/user/signup', [
     const profile = new Profile(req.body);
     profile.save((err, result) => {
         if(err) {
-            console.log(err);
+            console.error(err);
             return res.status(400).json({error:true, msg:'Error user signup'})
         }
         console.log(result)
-        res.status(200).json({ error:false, msg: 'User created successfully', user:result });
+        let otp = Math.floor(1000 + Math.random() * 9000);
+        let data = { otp, email };
+        
+        await Promise.all([
+            mailer.sendOTPToEmail(data),
+            Profile.updateOne({ _id:user._id }, { $set:{ otp, verified:0 }}),
+        ]);
+
+        return res.status(200).json({ error:false, msg:'OTP sent to your registered email' });
+        // res.status(200).json({ error:false, msg: 'User created successfully', user:result });
     });
 });
 
